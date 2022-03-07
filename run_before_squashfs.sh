@@ -27,7 +27,6 @@ arch_chroot "$(cat << EOF
 sed -i 's/#\(en_US\.UTF-8\)/\1/' "/etc/locale.gen"
 locale-gen
 ln -sf "/usr/share/zoneinfo/UTC" "/etc/localtime"
-rm "/etc/skel/"{"set_once.sh","mousepad.dconf"}
 
 #set root permission and shell
 chmod -R 700 "/root"
@@ -46,13 +45,16 @@ dbus-launch dconf load / < "xed.dconf"
 rm -R "/home/liveuser/.config"
 cp -R ".config" "/home/liveuser/.config"
 rm "/home/liveuser/"{".bashrc",".bash_profile","xed.dconf","set_once_xfce4.sh"}
-cp ".bashrc" ".bash_profile" "LICENSE" "user_pkglist.txt" "user_commands.bash" ".xinitrc" ".xprofile" ".Xauthority" ".xsession" "xed.dconf" "/home/liveuser/"
+cp ".bashrc" ".bash_profile" "user_pkglist.txt" "user_commands.bash" ".xinitrc" ".xprofile" ".Xauthority" "xed.dconf" "/home/liveuser/"
 chown -R liveuser:liveuser "/home/liveuser"
-chmod +x "/home/liveuser/"{".xprofile",".xinitrc",".xsession","user_commands.bash"}
+chmod +x "/home/liveuser/"{".xprofile",".xinitrc","user_commands.bash"}
 sudo -H -u liveuser bash -c 'dbus-launch dconf load / < "/home/liveuser/xed.dconf"'
 rm "/home/liveuser/xed.dconf"
+wget "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-ISO/main/LICENSE"
+mv "LICENSE" "/home/liveuser/"
 cd ..
 rm -R "liveuser-desktop-settings"
+rm endeavouros-wallpaper-blank-develiso.xcf
 
 # add builddate to motd:
 cat "/usr/lib/endeavouros-release" >> "/etc/motd"
@@ -111,9 +113,9 @@ rm "/boot/initramfs-linux.img"
 rm "/boot/intel-ucode.img"
 rm "/boot/vmlinuz-linux"
 
-# to install locally builded packages on ISO:
-#pacman -U --noconfirm "/root/calamares_current-3.2.44.3-4-any.pkg.tar.zst"
-#rm "/root/calamares_current-3.2.44.3-4-any.pkg.tar.zst"
+# to install locally builded packages on ISO (place packages under ..airootfs/root/packages)
+pacman -U --noconfirm -- "/root/packages/"*".pkg.tar.zst"
+rm -rf "/root/packages/"
 #rm "/var/log/pacman.log"
 
 # set wallpaper for live-session and save original for later
